@@ -1,18 +1,25 @@
-name: Deploy Flutter Web to GitHub Pages
+name: Deploy Flutter Web
 on:
   push:
     branches: [main]
+
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
       - run: flutter pub get
       - run: flutter build web
+      - run: touch build/web/.nojekyll  # Важно для Flutter!
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build/web
+          force_orphan: true  # Создаёт чистую ветку gh-pages
