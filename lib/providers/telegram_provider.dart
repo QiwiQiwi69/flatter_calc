@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/user_model.dart';
+import 'dart:js' as js;
 
 class TelegramProvider with ChangeNotifier {
   TelegramUser? _user;
@@ -38,8 +39,12 @@ class TelegramProvider with ChangeNotifier {
   Future<bool> _checkWebView() async {
     // Проверяем наличие объекта Telegram WebApp
     try {
-      final bool isWebView = (await _executeJavaScript('window.Telegram.WebApp.initData ? true : false')) as bool;
-      return isWebView;
+      final String isWebView = await _executeJavaScript('window.Telegram.WebApp.initData ? true : false');
+      print("Raw result: =$isWebView"); // Выведет "=true" или "=false"
+
+      final bool test = isWebView.toLowerCase() == 'true';
+      print("Boolean value: $test");
+      return test;
     } catch (e) {
       return false;
     }
@@ -63,8 +68,20 @@ class TelegramProvider with ChangeNotifier {
   Future<String> _executeJavaScript(String script) async {
     // Для web используем js-интероп, для мобильных платформ - webview_flutter
     // Это упрощенная реализация, в реальном приложении нужно адаптировать под платформы
-    return script;
+    return _executeJavaScriptWeb(script);
   }
+
+Future<String> _executeJavaScriptWeb(String script) async {
+  try {
+    // Используем dart:js для выполнения на вебе
+    final result = js.context.callMethod('eval', [script]);
+    return result.toString();
+  } catch (e) {
+    print('JS Error: $e');
+    return 'false';
+  }
+}
+
 
   // Отправка сообщения через бота
   Future<void> sendMessage(String text, String botToken) async {
