@@ -20,6 +20,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.DEPLOY_TOKEN }}
           publish_dir: ./build/web
           force_orphan: true  # Создаёт чистую ветку gh-pages
