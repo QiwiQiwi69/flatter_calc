@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
       - run: flutter pub get
-      - run: flutter build web
+      - run: flutter build web --base-href /flatter_calc/
       - run: touch build/web/.nojekyll  # Важно для Flutter!
 
   deploy:
